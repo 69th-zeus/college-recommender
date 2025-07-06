@@ -28,17 +28,22 @@ def main():
 
     if mode == 'JEE':
         jee()
-    elif mode == 'Rank Based Recommendation':
-        # neet()
-        pass
+    elif mode == 'NEET':
+        neet()
 
 def jee():
-    st.title('JEE College Recommender')
+    st.title('JEE College/Seat Recommender')
 
-    # Initialize Page
-    st.title("🎓 Browse Colleges")
-
-    st.write('The Looking Around page lets users explore available colleges based on their preferences. You can select the exam type (JEE Mains or Advanced), quota, gender, and institute type to filter results. It also allows you to choose specific years to view past cutoffs. The results are displayed in organized tables for each selected year. This feature helps users understand seat distributions without needing to input a rank.')
+    st.write("""The page lets users explore available colleges based on their JEE Rank and details. You can select the exam type (JEE Mains or Advanced), quota, gender, and institute type etc. to filter results. It also allows you to choose specific years to view past cutoffs. The results are displayed in organized tables for each selected year. It helps users get the most probable seat recommendations that have a high probability of actually getting assigned.
+             
+        My advice on how to use the app would be to - 
+             Step 1 -> Enter you rank and other details.
+             Step 2 -> Download the Data of the most recent year.
+             Step 3 -> Remove the college/seat options you don't want to attend and add in your Personal Preferences at the top.
+             Step 4 -> Verify The Correctness of data once off of the Internet (There's only so much Data Cleaning a Single Man And his AI can do)
+             Step 5 -> Fill it in your Counselling and Hope for your Dream Seat (IIT Bombay, CSE, Right!!)
+             
+        Optional - You Should Change Order of Options Before Entering it in Counselling according to your Personal Choice""")
 
     # Get Variables
     exam = st.selectbox('Select Exam (JEE Mains or JEE Advanced)', EXAM, placeholder='Choose An Option')
@@ -66,8 +71,9 @@ def jee():
     if quota != 'Show Me All':
         temp = temp[temp['Quota'] == quota]
     if rank != 0:
-        temp = temp[temp['Closing Rank (Last Round)'] > (1 + ceil(cutoff/100) * rank)]
-        temp.sort_values(by = 'Opening Rank (First Round)')
+        temp = temp[temp['Closing Rank (Last Round)'] > ceil((1 - (cutoff/100)) * rank)]
+        temp = temp[temp['Opening Rank (First Round)'] < ceil((1 + (cutoff/100)) * rank)]
+        temp.sort_values(by = 'Opening Rank (First Round)', inplace = True)
 
     if temp.shape[0] == 0:
         st.error("The Selected Variation has no Seats to Display")
@@ -78,5 +84,8 @@ def jee():
                 st.title(f"{year}'s Data")
                 st.dataframe(temp[temp['Year'] == year].reset_index(drop=True), use_container_width=True)
 
+def neet():
+    st.title('NEET College/Seat Recommender')
+    st.write("Work in Progress")
 
 main()
